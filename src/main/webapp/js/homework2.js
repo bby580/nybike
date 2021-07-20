@@ -1,5 +1,11 @@
 let this_url=window.location.href;
+//获取信息失败时调用
+function connectError(chart){
+    chart.hideLoading();
+    alert("获取数据失败！")
+}
 //*************要求6********************************************
+let activetop = echarts.init(document.getElementById('active'));
 function getTopData(){
     let nhour=hourInput.value;
     let pai=paihang.value;
@@ -7,7 +13,8 @@ function getTopData(){
     var stationid=[];
     var top_in=[];
     var top_out=[];
-    $.get(paiurl,function (result) {
+    activetop.showLoading();
+    $.ajax({url:paiurl,success:function(result){
         let tops=result;
         console.log(result)
         for(let i in tops){
@@ -16,7 +23,6 @@ function getTopData(){
             top_in.push(topp.in);
             top_out.push(topp.out);
         }
-        let activetop = echarts.init(document.getElementById('active'));
         option6 = {
             title: {text: '活跃度排行（左至右递减）'},
             tooltip: {trigger: 'axis'},
@@ -65,8 +71,11 @@ function getTopData(){
                 }
             ]
         };
+        activetop.hideLoading();
         activetop.setOption(option6);
-    });
+    },error:function (e){
+            console.log(e)
+        connectError(activetop)}});
 }
 
 //**********要求5***************************************************
@@ -74,24 +83,24 @@ function getNobikeData() {
     let min=minInput.value;
     let minurl=this_url+"/list?what=nobike&minute="+min;
 
-    $.get(minurl,function(result){
-        let str='';
-        console.log(result)
-        for(let i=0;i<result.length/10;i++){
-            str+='<tr>';
-            str += `<td>${i+1}</td>`;
-            for(let j=0;j<10&&i*10+j<result.length;j++){
-                str+=`<td>${result[i*10+j]}</td>`;
+    $.ajax({url:minurl,success:function(result){
+            let str='';
+            console.log(result)
+            for(let i=0;i<result.length/10;i++){
+                str+='<tr>';
+                str += `<td>${i+1}</td>`;
+                for(let j=0;j<10&&i*10+j<result.length;j++){
+                    str+=`<td>${result[i*10+j]}</td>`;
+                }
+                str+='</tr>';
             }
-            str+='</tr>';
-        }
-        nobike_tb.innerHTML = str;
-    });
+            nobike_tb.innerHTML = str;
+        },error:function (e){connectError()}});
 }
 //**********要求3、4*************************************************
 var noserverUrl="https://gbfs.citibikenyc.com/gbfs/en/station_status.json";
 function realtime(selec){
-    $.get(noserverUrl,function(result){
+    $.ajax({url:noserverUrl,success:function(result){
         var stations=result.data.stations;
         var nobike=[];
         for(var index in stations){
@@ -134,7 +143,7 @@ function realtime(selec){
             }
             tb2.innerHTML = str;
         }
-    });
+    },error:function (e){connectError()}});
 }
 // *******要求1、2***************************************************************
 let chat_nba = echarts.init(document.getElementById('chartNba'));
@@ -155,7 +164,6 @@ let option_nba = {
 };
 let option_nda=JSON.parse(JSON.stringify(option_nba));
 function getNumTimeData(sel) {
-
     let sid=72;
     let hour=1;
     let option={};
@@ -174,15 +182,15 @@ function getNumTimeData(sel) {
     console.log(sid,hour);
     let url=this_url+"/num_available?what="+sel+"&sid="+sid+"&hour="+hour;
     chat.showLoading();
-    $.get(url,function (result) {
-        chat.hideLoading();
-        console.log(result)
+    $.ajax({url:url,success:function(result){
+        console.log("结果：",result)
         //收到相应数据
         let xData=result.xData;
         for (let i in xData) xData[i]=xData[i].split(" ")[1].substr(0,5);
         option.xAxis.data=xData;
         option.series[0].data=result.yData;
         // console.log('收到相应数据:',xData,result.yData);
+        chat.hideLoading();
         chat.setOption(option);
-    })
+    },error:function (e){connectError(chat)}});
 }
