@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>第一次作业</title>
+  <style>
+    p {text-indent: 2ch}
+    .homework-box{
+      border-style: double;
+      overflow: hidden;
+      text-align: center;
+    }
+    .show-wind{
+      border-style: inset;
+      width: 30%;
+      height: 400px;
+      float: left;
+      margin: 1%;
+    }
+    .flash-bt{
+      /*float: contour;*/
+      position: relative;
+      bottom: 5px;
+      width: 6%;
+      font-size: larger;
+    }
+  </style>
+  <script src="../../js/jquery-3.5.1.min.js"></script>
+  <script src="../../js/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+</head>
+<body>
+  <h1>第一次作业</h1>
+  <p>在`status1.html`中添加2个新的仪表盘图表，分别显示有电动车站点的数量和没有可用桩站点的数量，设计合理的布局，显示当前实时的情况。以word文档的形式提交。</p>
+  <dl>
+    <dt>作业要求</dt>
+    <dd>1.结果截图</dd>
+    <dd>2.页面完整源代码</dd>
+    <dd>3.文件名称：班级+学号+姓名</dd>
+    <dd style="color: red">4.周四晚6点前提交。</dd>
+  </dl>
+  <h2>解答：</h2>
+  <div class="homework-box">
+    <div style="text-align: left;margin-left: 5px">
+
+      <dl id="showList" style="margin-left: 10px">
+        <li>刷新时间：{{date}}</li>
+        <li>总站点数：{{ept_data.value+usb_data.value}}</li>
+        <li><span style="color: red">没有</span>自行车的站点数：{{ept_data.value}} ({{ept_data.rate}}%)</li>
+        <li><span style="color: red">有</span>自行车可用的站点数：{{usb_data.value}} ({{usb_data.rate}}%)</li>
+        <li><span style="color: red">无可用桩</span>的站点数：{{ndk_data.value}} ({{ndk_data.rate}}%)</li>
+      </dl>
+    </div>
+    <div class="show-wind" id="showWind1"></div>
+    <div class="show-wind" id="showWind2"></div>
+    <div class="show-wind" id="showWind3"></div>
+    <button class="flash-bt" onclick="flashStations()">刷新</button>
+  </div>
+  <script>
+    let statueUrl='https://gbfs.citibikenyc.com/gbfs/en/station_status.json'
+    let chat_empty = echarts.init(document.getElementById('showWind1'));
+    let chat_usb = echarts.init(document.getElementById('showWind2'));
+    let chat_nodk = echarts.init(document.getElementById('showWind3'));
+    let nowDate=new Date();
+    let myVue=new Vue({
+      el:'#showList',
+      data:{
+        ept_data:{value:0,rate:0},
+        usb_data:{value:0,rate:0},
+        ndk_data:{value:0,rate:0},
+        date:nowDate
+      }
+    });
+    let option_empty = {
+      title: {text:'没有电动车的站点数'},
+      tooltip: {formatter: '{a} <br/>{b} : {c} 个'},
+      series: [{
+        name: 'Pressure',
+        type: 'gauge',
+        progress: {
+          show: true,
+          width: 11
+        },
+        max:100, min:0,
+        detail: {
+          formatter: '{value}'
+        },
+        data: [{
+          value: 0
+        }]
+      }]
+    };
+    let option_usb = JSON.parse(JSON.stringify(option_empty));//拷贝设置参数
+    let option_nodock = JSON.parse(JSON.stringify(option_empty));//拷贝设置参数
+    option_usb.title.text="有电动车可用的站点数";
+    option_nodock.title.text="无可用桩的站点数";
+    //数据可视化
+    function setData(ept_num,usb_num,ndk_num) {
+      myVue.date=nowDate;
+      myVue.ept_data.value=ept_num;
+      myVue.usb_data.value=usb_num;
+      myVue.ndk_data.value=ndk_num;
+      myVue.ept_data.rate=(ept_num/(ept_num+usb_num)*100).toFixed(2);
+      myVue.usb_data.rate=100-myVue.ept_data.rate;
+      myVue.ndk_data.rate=(ndk_num/(ept_num+usb_num)*100).toFixed(2);
+      //设置空站点表
+      option_empty.series[0].max=ept_num+usb_num;
+      option_empty.series[0].data[0].value=ept_num;
+      //设置非空站点表
+      option_usb.series[0].max=ept_num+usb_num;
+      option_usb.series[0].data[0].value=usb_num;
+      //设置无可用桩表
+      option_nodock.series[0].max=ept_num+usb_num;
+      option_nodock.series[0].data[0].value=ndk_num;
+      //画表
+      chat_empty.setOption(option_empty);
+      chat_usb.setOption(option_usb);
+      chat_nodk.setOption(option_nodock);
+    }
+    //获取数据并解析
+    function flashStations() {
+        let empty_num=0;
+        let usable_num=0;
+        let nodock_num=0;
+        nowDate=new Date();//设置时间
+        $.get(statueUrl,function (result) {
+          //收到相应数据
+          console.log('收到相应数据:',result)
+          let stations=result.data.stations
+          for (i in stations){
+            let station = stations[i]
+            if (station.num_ebikes_available==0) empty_num++;
+            else usable_num++;
+            if (station.num_docks_available==0)nodock_num++;
+          }
+          setData(empty_num,usable_num,nodock_num);
+        })
+    }
+    flashStations();
+  </script>
+</body>
+</html>

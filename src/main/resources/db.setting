@@ -1,0 +1,13 @@
+## db.setting文件
+url =jdbc:mysql://120.24.57.160:3306/nybikedb
+user =cmjd
+pass =cmjd@XTU2021
+## 可选配置
+# 是否在日志中显示执行的SQL
+showSql = false
+# 是否格式化显示的SQL
+formatSql = false
+# 是否显示SQL参数
+showParams = true
+# 打印SQL的日志等级，默认debug，可以是info、warn、error
+sqlLevel = error

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<h1>hello world!</h1>
+<button onclick="fn1()">憨憨</button>
+<script type="text/javascript" >
+  let cnt=0;
+  function fn1() {
+    switch (cnt++) {
+      case 0:alert('别点了！');break;
+      case 1:alert('别点了，事不过三啊！！');break;
+      case 2:alert('事不过三啊我告诉你！');break;
+      default:
+        while (true){
+          alert('傻憨憨！');
+        }
+    }
+  }
+</script>
+</body>
+</html>

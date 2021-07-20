@@ -1,0 +1,70 @@
+table
+{
+    border-collapse: collapse;
+    margin: 0 auto;
+    text-align: center;
+    border: 1px solid black;
+    table-layout:fixed;
+}
+.id-list-table{
+    border-collapse: collapse;
+    margin-top: 10px;
+    text-align: center;
+    border: 1px solid black;
+    table-layout:fixed;
+    display: block;
+    height: 80%;
+    overflow-y: scroll;
+}
+.id-list-table tr,td{
+    background-color : greenyellow;
+    border: 2px solid black;
+    padding: 10px;
+}
+.id-list-table td{
+    width: 10%;
+}
+.id-list-table tr td:first-child{
+    background-color: green;
+    width: 5%;
+}
+/*tr,td{*/
+/*    background-color : greenyellow;*/
+/*    border: 1px solid black;*/
+/*}*/
+h2{height: 5%;}
+p {text-indent: 2ch}
+.red-box{
+    color: red;
+}
+.answer-box{
+    margin-left: 1%;
+}
+.mode-box{
+    border-style: double;
+    text-align: center;
+    width: 48%;
+    min-width: 500px;
+    min-height: 500px;
+    height: 30vw;
+    float: left;
+}
+.mode-controls{
+    margin-top: 1%;
+    font-size: small;
+    height: 5%;
+}
+.mode-controls span{
+    margin-left: 1ch;
+    margin-right: 1ch;
+}
+.sid-input,min_input{
+    width: 10ch;
+}
+.hour-input{
+    width: 4ch;
+}
+.chart{
+    width: 100%;
+    height: 90%;
+}

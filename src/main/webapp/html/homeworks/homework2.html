@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>nybike</title>
+  <link rel="stylesheet" type="text/css" href="/nybike/css/homework2.css">
+  <script src="/nybike/js/jquery-3.5.1.min.js"></script>
+  <script src="/nybike/js/echarts.min.js"></script>
+  <!--  <script src="js/vue.js"></script>-->
+</head>
+<body>
+<div class="question-box">
+  <h1>第二次作业</h1>
+  <dl>
+    <dt>任务</dt>
+    <dd>1.每组的数据工程师要保证对外开放自己云主机的nybikedb库，其他组员可以访问到该库，组长监督</dd>
+    <dd>2.根据代码示例，完成服务器端所有代码</dd>
+    <dd>3.跟随笔记，完成浏览器端代码，实现整个用例</dd>
+    <dd>4.额外开发一个类似的用例：根据给定的站点id，查询<span class="red-box">指定周期</span>内该站点的可用桩数量走势。</dd>
+  </dl>
+  额外需求（准备答辩,红色为难点）：
+  <ol>
+    <li>根据给定的站点id，查询指定周期内该站点的<span class="red-box">可用车</span>数量走势；<a href="#nba-box">我是任意门</a></li>
+    <li>根据给定的站点id，查询指定周期内该站点的<span class="red-box">可用桩</span>数量走势；<a href="#nda-box">我是任意门</a></li>
+    <li>显示所有<span class="red-box">不能服务</span>的站点id；<a href="#out-service-box">我是任意门</a></li>
+    <li>根据站点id查询站点<span class="red-box">实时信息；<a href="#real-info-box">我是任意门</a></span></li>
+    <li><span class="red-box">显示从当前时间开始向前m分钟内没有可用车的站点id；<a href="#no-usable-box">我是任意门</a></span></li>
+    <li><span class="red-box">显示n小时内最活跃的100个站点id；<a href="#active-top-box">我是任意门</a></span></li>
+
+  </ol>
+  <hr/>
+  <h2>解答：</h2>
+</div>
+<div class="answer-box">
+  <!-- >查询某站点可用车数 -->
+  <div class="mode-box" id="nba-box">
+    <h2>1. 查询某站点可用<span style="color:red;">车</span>数</h2>
+    <div class="mode-controls">
+      <span>站点id：</span><input class="sid-input" type="number" oninput="if(value<72)value=72;else if(value>4639)value=4639;" value="72" id="nbaSidInput">
+      <span>查询时间：</span><input class="hour-input" type="number" value="1" oninput="if(value<1)value=1;else if(value>24)value=24;"id="nbaHourInput"><span>小时内</span>
+      <button onclick="getNumTimeData('nba')">查询</button>
+    </div>
+    <div class="chart" id="chartNba"></div>
+  </div>
+
+  <div class="mode-box" id="nda-box">
+    <h2>2. 查询某站点可用<span style="color:red;">桩</span>数</h2>
+    <div class="mode-controls">
+      <span>站点id：</span><input class="sid-input" type="number" oninput="if(value<72)value=72;else if(value>4639)value=4639;" value="72" id="ndaSidInput">
+      <span>查询时间：</span><input class="hour-input" type="number" value="1" oninput="if(value<1)value=1;else if(value>24)value=24;"id="ndaHourInput"><span>小时内</span>
+      <button onclick="getNumTimeData('nda')">查询</button>
+    </div>
+    <div class="chart" id="chartNda"></div>
+  </div>
+
+  <div class="mode-box" id="out-service-box">
+    <h2>3. 显示所有<span style="color:red;">不能服务</span>的站点id</h2>
+    <button onclick="realtime('3')">查询</button>
+    <div class="chart" id="noserver">
+      <table class="id-list-table"><tbody id="tb2"></tbody></table>
+    </div>
+  </div>
+
+  <div class="mode-box" id="real-info-box">
+    <h2>4. 根据<span style="color:red;">站点id</span>查询实时信息</h2>
+    <div class="mode-controls">
+      <span>站点id：</span><input class="sid-input" type="number" oninput="if(value<72)value=72;else if(value>4639)value=4639;" value="72" id="realtimeSidInput">
+      <button onclick="realtime('4')">查询</button>
+    </div>
+    <div class="chart" id="realmes">
+      <table>
+        <thead>
+        <tr>
+          <td>站点ID</td>
+          <td>站点状态</td>
+          <td>自行车损坏数量</td>
+          <td>自行车剩余量</td>
+          <td>电动车剩余量</td>
+          <td>最近汇报时间</td>
+        </tr>
+        </thead>
+        <tbody id="tb3"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="mode-box" id="no-usable-box">
+    <h2>5. 查询连续<span style="color:red;">m</span>分钟没有可用车的id</h2>
+    <div class="mode-controls">
+      <span>输入分钟数：</span><input class="min-input" type="number" oninput="if(value<=0)value=1;else if(value>1200)value=1200;" value="1" id="minInput">
+      <button onclick="getNobikeData()">查询</button>
+    </div>
+    <div class="chart" id="beforemin">
+      <table class="id-list-table"><tbody id="nobike_tb"></tbody></table>
+    </div>
+  </div>
+
+  <div class="mode-box" id="active-top-box">
+    <h2>6. 查询<span style="color:red;">n</span>小时内活跃度排行</h2>
+    <div class="mode-controls">
+      <span>输入n小时内：</span><input class="min-input" type="number" oninput="if(value<=0)value=1;else if(value>24)value=24;" value="1" id="hourInput">
+      <span>输入前多少排行</span><input class="min-input" type="number" oninput="if(value<=0)value=1;else if(value>200)value=200;" value="100" id="paihang">
+      <button onclick="getTopData()">查询</button>
+    </div>
+    <div class="chart" id="active"></div>
+  </div>
+</div>
+<script type="text/javascript" src="/nybike/js/homework2.js"></script>
+</body>
+</html>

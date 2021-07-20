@@ -1,0 +1,35 @@
+.top-box{
+    margin-left: 1%;
+}
+.map-box,.map-shape-box{
+    width: 49%;
+    height:49vw;
+    float: left;
+    border-style: double;
+}
+.station_info-box{
+    width: 100%;
+    height: 25%;
+    border-style: double;
+    overflow-y: scroll;
+}
+#action_chart{
+    width: 100%;
+    height: 73%;
+    width: 100%;height: 73%;
+    border-style: double;
+}
+.station_info-box div{
+    float: left;
+    border-radius: 5%;
+    overflow-y: scroll;
+}
+.station_info{width: 30%;height:100%;border-style: double;margin-left: 1%;}
+.station_info-bt-box{width: 65%;height:100%;border-style: double;}
+.station_info-bts input{
+    width: 40px;
+    margin-right: 2px;
+}
+.station_info-bts{
+    margin-top:40px;
+}
