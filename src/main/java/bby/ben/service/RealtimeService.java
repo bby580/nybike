@@ -133,8 +133,8 @@ public class RealtimeService {
      * @author: 本小蛋
      * @time: 2021/7/17 13:22
      */
-    public  HashMap<String, BikesLivelyData> getLivelyIOList(int hour){
-        List<Entity> list = realtimeDao.listNumBikes(hour);
+    public  HashMap<String, BikesLivelyData> getLivelyIOList(int minute){
+        List<Entity> list = realtimeDao.listNumBikes(minute);
 
         if (list==null){
             MyTool.log("getLivelyIOList() 查询数据库错误！");

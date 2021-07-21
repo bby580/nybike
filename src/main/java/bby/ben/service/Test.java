@@ -1,5 +1,6 @@
 package bby.ben.service;
 
+import bby.ben.bbytool.MyTool;
 import bby.ben.pojo.BikesLivelyData;
 
 import java.util.ArrayList;
@@ -8,11 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Test {
+    static void log(Object... objs){
+        for (Object obj :objs)
+            System.out.println(obj);
+    }
     public static void main(String[] args) {
-
-        Date date=new Date();
-
-        System.out.println(date.getTime());
-        System.out.println(date.getTime()-60000);
+        MyTool.log("aaa");
+        MyTool.log("aaa","asdd");
     }
 }

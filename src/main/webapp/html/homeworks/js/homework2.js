@@ -1,4 +1,5 @@
-let this_url=window.location.href;
+let this_url=window.location.origin+"/nybike/realtime";
+console.log(this_url)
 //获取信息失败时调用
 function connectError(chart){
     chart.hideLoading();
@@ -7,12 +8,13 @@ function connectError(chart){
 //*************要求6********************************************
 let activetop = echarts.init(document.getElementById('active'));
 function getTopData(){
-    let nhour=hourInput.value;
+    let minute=topMinInput.value;
     let pai=paihang.value;
-    let paiurl=this_url+"/list?what=iotop&hour="+nhour+"&top="+pai;
+    let paiurl=this_url+"/list?what=iotop&minute="+minute+"&top="+pai;
     var stationid=[];
     var top_in=[];
     var top_out=[];
+    console.log(paiurl)
     activetop.showLoading();
     $.ajax({url:paiurl,success:function(result){
         let tops=result;

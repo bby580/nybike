@@ -113,19 +113,19 @@ public class RealtimeDao {
     }
     /**
      * @description: 获取hour小时内车数和id
-     * @param hour 时间
+     * @param minute 时间
      * @return:
      * @author: 本小蛋
      * @time: 2021/7/17 12:46
      */
-    public List<Entity> listNumBikes(int hour){
-        String sql="select station_id,num_bikes_available,num_ebikes_available from t_status where created_time > DATE_SUB(NOW(),INTERVAL ? HOUR)";
+    public List<Entity> listNumBikes(int minute){
+        String sql="select station_id,num_bikes_available,num_ebikes_available,last_reported from t_status where created_time > DATE_SUB(NOW(),INTERVAL ? MINUTE)";
         List<Entity> list = null;
         try {
-            list=Db.use().query(sql,hour);
+            list=Db.use().query(sql,minute);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-            System.out.println("--------------->数据库读取出错，hour="+hour);
+            System.out.println("--------------->数据库读取出错，hour="+minute);
         }
         return list;
     }

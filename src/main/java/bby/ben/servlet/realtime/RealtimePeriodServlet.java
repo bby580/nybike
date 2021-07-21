@@ -1,5 +1,6 @@
 package bby.ben.servlet.realtime;
 
+import bby.ben.bbytool.MyTool;
 import bby.ben.pojo.StationNTData;
 import bby.ben.service.RealtimeService;
 import cn.hutool.json.JSONUtil;
@@ -26,21 +27,13 @@ public class RealtimePeriodServlet extends HttpServlet {
         String startTimeStr=req.getParameter("startTime");
         String endTimeStr=req.getParameter("endTime");
         String what=req.getParameter("what");
-        System.out.println(what);
-        String patten="^[0-9]+$";
         StationNTData stationNTData=null;
-        if (Pattern.matches(patten,sid)&&Pattern.matches(patten,startTimeStr)&&Pattern.matches(patten,endTimeStr)){
+        if (MyTool.isDigit(sid)&&MyTool.isDigit(startTimeStr)&&MyTool.isDigit(endTimeStr)){
             long startTime=Long.parseLong(startTimeStr);
             long endTime=Long.parseLong(endTimeStr);
             if ("nba".equals(what))
                 stationNTData = realtimeService.findNbaBySid(sid,startTime,endTime);
-            else {
-                System.out.println(sid);
-                System.out.println(startTime);
-                System.out.println(endTime);
-            }
         }
-        System.out.println(stationNTData);
         resp.getWriter().write(JSONUtil.toJsonStr((stationNTData==null)?"输入参数有误！":stationNTData));
     }
 }
