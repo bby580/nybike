@@ -4,15 +4,18 @@ import bby.ben.pojo.BikesLivelyData;
 import bby.ben.pojo.StationNTData;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 public class RealtimeServiceTest {
 
-//    @Test
+    @Test
     public void findNbaBySid() {
-        HashMap<String,Integer> out=new HashMap<>();
-        System.out.println(out.get("1234"));
+        RealtimeService service=new RealtimeService();
+        long now=new Date().getTime();
+        StationNTData list = service.findNbaBySid("72", now - 600000, now);
+        System.out.println(list);
     }
     @Test
     public void getsLivelyListByTop() {

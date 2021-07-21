@@ -1,4 +1,4 @@
-package bby.ben.servlet;
+package bby.ben.servlet.realtime;
 
 import bby.ben.pojo.BikesLivelyData;
 import bby.ben.service.RealtimeService;
@@ -14,7 +14,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 @WebServlet("/realtime/list")
-public class StationListServlet extends HttpServlet
+public class RealtimeListServlet extends HttpServlet
 {
     RealtimeService realtimeService =new RealtimeService();
     @Override

@@ -6,7 +6,9 @@ import bby.ben.pojo.BikesLivelyData;
 import bby.ben.pojo.StationNTData;
 import cn.hutool.db.Entity;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,6 +24,30 @@ public class RealtimeService {
      */
     public StationNTData findNbaBySid(String sid, int hour){
         List<Entity> list = realtimeDao.listNbaBySid(sid, hour);
+        List<String> xData=new ArrayList<>();
+        List<Integer> yData=new ArrayList<>();
+        if (list==null){
+            MyTool.log("findNbaBySid() 查询数据库错误！");
+            return null;
+        }
+        for (Entity entity :list){
+            xData.add(entity.getStr("created_time"));
+            yData.add(entity.getInt("num_bikes_available"));
+        }
+
+        return new StationNTData(xData,yData);
+    }
+    /**
+     * @description: 获取 start-end 时间段内sid站点的可用车数量变化
+     * @param sid 站点id
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return:
+     * @author: 本小蛋
+     * @time: 2021/7/21 16:29
+     */
+    public StationNTData findNbaBySid(String sid, long startTime,long endTime){
+        List<Entity> list = realtimeDao.listNbaBySid(sid, new Timestamp(startTime),new Timestamp(endTime));//date是java.sql.Date;
         List<String> xData=new ArrayList<>();
         List<Integer> yData=new ArrayList<>();
         if (list==null){

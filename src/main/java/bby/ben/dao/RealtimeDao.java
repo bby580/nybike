@@ -4,6 +4,8 @@ import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
 
 import java.sql.SQLException;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -31,6 +33,28 @@ public class RealtimeDao {
         }
         return list;
     }
+    /**
+     * @description:
+     * @param sid 站点id
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return:
+     * @author: 本小蛋
+     * @time: 2021/7/21 16:27
+     */
+    public List<Entity> listNbaBySid(String sid, Timestamp startTime, Timestamp endTime){
+        String sql="select station_id, num_bikes_available, created_time from t_status where station_id=? and created_time >= ? and created_time <= ?";
+        List<Entity> list=null;
+        try {
+            list=Db.use().query(sql,sid,startTime,endTime);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            System.out.println("--------------->数据库读取出错，sid="+sid+",start="+startTime+",endTime="+endTime);
+        }
+        return list;
+    }
+    //;
+
     /**
      * @description: 查询hour小时内sid站点的可用桩数量变化
      * @param sid 站点id

@@ -1,4 +1,4 @@
-package bby.ben.servlet;
+package bby.ben.servlet.realtime;
 
 import bby.ben.pojo.StationNTData;
 import bby.ben.service.RealtimeService;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 @WebServlet("/realtime/num_available")
-public class StationNAServlet extends HttpServlet {
+public class RealtimeNAServlet extends HttpServlet {
     RealtimeService realtimeService=new RealtimeService();
 
     @Override
