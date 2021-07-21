@@ -144,11 +144,14 @@ public class RealtimeService {
         HashMap<String, BikesLivelyData> data=new HashMap<>();
         String station_id="";
         int bikes=0;int sub=0;
+        long last_reported=0;
         for (Entity entity :list){
             station_id=entity.getStr("station_id");
             bikes=entity.getInt("num_bikes_available")+entity.getInt("num_ebikes_available");
+            last_reported=entity.getLong("last_reported");
+
             if (data.get(station_id)==null){
-                data.put(station_id,new BikesLivelyData(bikes,station_id));//新建记录
+                data.put(station_id,new BikesLivelyData(bikes,station_id,last_reported));//新建记录
                 continue;
             }
             BikesLivelyData station = data.get(station_id);
@@ -156,9 +159,17 @@ public class RealtimeService {
             sub=bikes-station.last;
             if (sub>0)//当前比前面大,流入了
                 station.outAdd(sub);
-            else
+            else if (sub<0)
                 station.inAdd(-sub);
+            else {
+                if(station.last_reported!=last_reported){//单车数不变，但是最后还车数变了
+                        station.inAdd(1);
+                        station.outAdd(1);
+                }
+            }
+            station.last_reported=last_reported;
             station.last=bikes;//记录这次的车数，用以下次判断
+
         }
         return data;
     }
