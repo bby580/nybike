@@ -4,7 +4,7 @@ user =cmjd
 pass =cmjd@XTU2021
 ## 可选配置
 # 是否在日志中显示执行的SQL
-showSql = false
+showSql = true
 # 是否格式化显示的SQL
 formatSql = false
 # 是否显示SQL参数

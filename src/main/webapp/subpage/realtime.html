@@ -1,0 +1,591 @@
+
+<div class="single-station-box">
+    <h1>单个站点信息查询</h1>
+    <div class="map-box" >
+        <div class="box box-warning" id="stationMap">
+            <div class="box-header with-border">
+                <h3 class="box-title">地图</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" onclick="" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                </div>
+                <!-- /.box-tools -->
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div>
+                    <div class="form-group" data-select2-id="24">
+                        <label>选择查看地图</label>
+                        <select id="selMapData" class="form-control select2" style="width: 100%;" data-select2-id="1" tabindex="-1" aria-hidden="true">
+                            <option value="0" selected data-select2-id="12">nybike站点分布</option>
+                            <option value="top1" data-select2-id="12">最近1h内单车流量Top100</option>
+                            <option value="top5" data-select2-id="13">最近5h内单车流量Top100</option>
+                            <option value="li2" data-select2-id="14">最近2min内没有可用车的站点</option>
+                            <option value="li5" data-select2-id="15">最近5min内没有可用车的站点</option>
+                            <option value="li30" data-select2-id="15">最近30min内没有可用车的站点</option>
+                            <option value="li60" data-select2-id="15">最近1h内没有可用车的站点</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="mapSS" style="height: 600px;width: 100%"></div>
+            </div>
+            <!-- /.box-body -->
+        </div>
+
+    </div>
+    <div class="map-shape-box" id="map-tab">
+        <div class="box box-warning" id="stationInfoBox">
+            <div class="box-header with-border">
+                <h3 class="box-title">信息</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" onclick="" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+
+                </div>
+                <!-- /.box-tools -->
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div id="rateChartSS" style="height: 350px;width:100%;margin-top: 8%"></div>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <div class="box box-warning" id="stationInfoChartBox">
+            <div class="box-header with-border">
+                <h3 class="box-title">图表</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" onclick="" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                </div>
+                <!-- /.box-tools -->
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="form-group">
+                    <div class="col-md-6" data-select2-id="25">
+                        <div class="form-group" data-select2-id="24">
+                            <label>单选</label>
+                            <select id="dateSelectSS" class="form-control select2" style="width: 100%;" data-select2-id="1" tabindex="-1" aria-hidden="true">
+                                <option value="nba" selected="selected" data-select2-id="1">历史可用车数量走势</option>
+                                <option value="nbd" data-select2-id="2">历史损坏车数量走势</option>
+                                <option value="nda" data-select2-id="3">历史损坏车桩数量走势</option>
+                            </select>
+                        </div>
+                        <!-- /.form-group -->
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label>日期时间范围：</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-clock-o"></i>
+                                    </div>
+                                    <input type="text" class="form-control pull-right" id="reservationtime">
+                                </div>
+                                <!-- /.input group -->
+                            </div>
+                        </div>
+                        <!-- /.form-group -->
+                    </div>
+                </div>
+                <div class="form-group">
+<!--                    <div>s;sld;</div>-->
+                    <div id="chartSS" class="chart-SS"></div>
+                </div>
+
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+    var myMapSS = echarts.init(document.getElementById('mapSS'));
+    $('#reservationtime').daterangepicker({
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            '近 30 天': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },locale: {
+            format: "YYYY/MM/DD/hh:mm:ss",
+            applyLabel: "确定",
+            cancelLabel: "取消",
+            daysOfWeek: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+            monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            firstDay: 1
+        }, timePicker: true
+    }).on('apply.daterangepicker', function(ev, picker) {
+        startTime=picker.startDate._d.getTime();
+        endTime=picker.endDate._d.getTime();
+        getRealtimeData(dateSelectSS.value,selSidRealTime,startTime,endTime);
+    });
+    dateSelectSS.onchange=function () {
+        getRealtimeData(dateSelectSS.value,selSidRealTime,startTime,endTime);
+    };
+    selMapData.onchange=function () {
+        let val=selMapData.value;
+        let url=root_url;
+
+        if (val=="top1")url+="/realtime/list?what=iotop&hour=1&top=100";
+        else if (val=="top5")url+="/realtime/list?what=iotop&hour=5&top=100";
+        else if (val=="li2")url+="/realtime/list?what=nobike&minute=2";
+        else if (val=="li5")url+="/realtime/list?what=nobike&minute=5";
+        else if (val=="li30")url+="/realtime/list?what=nobike&minute=5";
+        else if (val=="li60")url+="/realtime/list?what=nobike&minute=5";
+        else {
+            setMapDataStation();
+            return;
+        }
+        console.log(url);
+
+        myMapSS.showLoading();
+        $.ajax({
+            url:url,
+            success:(res)=>{
+                console.log(res);
+                if (res.length==0){
+                    alert("无数据！");
+                    return;
+                }
+                if (val[0]=='t') setMapDataIoTop(res);
+                else if (val[0]=='l') setMapDataList(res);
+                myMapSS.hideLoading()
+            },error:(res)=>{
+                console.log(res);
+                myMapSS.hideLoading()
+                alert("获取数据失败！")
+            }
+        })
+    }
+    var data = [];
+    for (var key in geoCoordMap)
+        data.push({name: key,value: 100});
+    var convertData = function (data) {
+        var res = [];
+        for (var i = 0; i < data.length; i++) {
+            var geoCoord = geoCoordMap[data[i].name];
+            if (geoCoord) {
+                res.push({
+                    name: data[i].name,
+                    value: geoCoord.concat(data[i].value)
+                });
+            }
+        }
+        return res;
+    };
+    var  val_max=0;
+    function symbolSize(val) {
+        if(val[2]<val_max/4) return 10;
+        else if (val[2]<val_max/2) return 15;
+        else if (val[2]<val_max/4*3) return 20;
+        else return 25;
+    }
+    //--------------------------------------------
+    //站点分类
+   let optionMapSS = {
+        title: {
+            text: 'nybike站点分布',
+            subtext: '站点分布',
+            left: 'center'
+        },
+        tooltip : {
+            trigger: 'item'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'center',
+            bottom:'bottom',
+            backgroundColor: 'rgba(150,0,150,0.5)',
+            data: ['普通站点', '不可用站点', '无可用车站点', '无可用桩站点']
+        },
+        bmap: {
+            center: [-73.9558732509613, 40.744363287066875],
+            zoom: 15,
+            roam: true,
+            // mapStyle: {
+            //   styleJson: []
+            // }
+        },
+        series : [
+            {
+                name: '无可用桩站点',
+                type: 'scatter',
+                coordinateSystem: 'bmap',
+                data: [],
+                symbolSize: symbolSize,
+                encode: {
+                    value: 2
+                },
+                label: {
+                    formatter: '{b}',
+                    position: 'right',
+                    show: false
+                },
+                emphasis: {
+                    label: {
+                        show: true
+                    }
+                },
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowColor: '#333',
+                    normal:{
+                        color:"#196AAB"
+                    }
+                },
+                zlevel: 1
+            }, {
+                name: '普通站点',
+                type: 'scatter',
+                coordinateSystem: 'bmap',
+                data: [],
+                symbolSize: symbolSize,
+                encode: {
+                    value: 2
+                },
+                label: {
+                    formatter: '{b}',
+                    position: 'right',
+                    show: false
+                },
+                emphasis: {
+                    label: {
+                        show: true
+                    }
+                },
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowColor: '#333',
+                    normal:{
+                        color:"#F2DF5D"
+                    }
+                },
+                zlevel: 1
+            },
+            {
+                name: '无可用车站点',
+                type: 'effectScatter',
+                coordinateSystem: 'bmap',
+                data: [],
+                symbolSize: symbolSize,
+                encode: {
+                    value: 2
+                },
+                showEffectOn: 'render',
+                rippleEffect: {
+                    brushType: 'stroke'
+                },
+                hoverAnimation: true,
+                label: {
+                    formatter: '{b}',
+                    position: 'right',
+                    show: false
+                },
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowColor: '#333',
+                    normal:{
+                        color:"#BCCE57"
+                    }
+                },
+                zlevel: 1
+            },
+
+            {
+                name: '不可用站点',
+                type: 'scatter',
+                coordinateSystem: 'bmap',
+                data: [],
+                symbolSize: symbolSize,
+                encode: {
+                    value: 2
+                },
+                label: {
+                    formatter: '{b}',
+                    position: 'right',
+                    show: false
+                },
+                emphasis: {
+                    label: {
+                        show: true
+                    }
+                },
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowColor: '#333',
+                    normal:{
+                        color:"#D94F61"
+                    }
+                },
+                zlevel: 1
+            }
+
+        ]
+    };
+    setMapDataStation();
+    function setMapDataStation() {
+        myMapSS.showLoading()
+        $.ajax({url:'https://gbfs.citibikenyc.com/gbfs/en/station_status.json',success:function (result) {
+            var ret0=[];
+            var ret1=[];
+            var ret2=[];
+            var ret3=[];
+            var stations=result.data.stations;
+                val_max=0;
+                myMapSS.hideLoading();
+            for(var index in stations){
+                var station=stations[index];
+                let num=parseInt(station.num_ebikes_available)+parseInt(station.num_bikes_available);
+                if(station.station_status!='active'){//不是活动状态
+                    ret3.push({name:idnameMap[station.station_id], num});
+                    continue;
+                }
+                if (station.num_docks_available=='0'&&station.num_bikes_available!='0')
+                    ret0.push({name:idnameMap[station.station_id], value:num});
+                else if(num)//无可用自行车或者电动车
+                    ret2.push({name:idnameMap[station.station_id], num});
+                else ret1.push({name:idnameMap[station.station_id], num});
+                // ret1.push({name:idnameMap[station.station_id], value:parseInt(station.num_ebikes_available)+parseInt(station.num_bikes_available)});
+                // if(station.station_status!='active'){//不是活动状态
+                //     ret3.push({name:idnameMap[station.station_id], value:});
+                // }else num=parseInt(station.num_ebikes_available)+parseInt(station.num_bikes_available);
+                // if(station.num_bikes_available=='0'&&station.num_ebikes_available=='0'){//无可用自行车或者电动车
+                //     ret2.push({name:idnameMap[station.station_id], value:parseInt(station.num_ebikes_available)+parseInt(station.num_bikes_available)});
+                // }
+                // if(station.num_docks_available=='0'){//可用桩为0
+                //     ret0.push({name:idnameMap[station.station_id], value:parseInt(station.num_ebikes_available)+parseInt(station.num_bikes_available)});
+                // }
+                if (num>val_max)val_max=num;
+            }
+            optionMapSS.title.text="nybike站点分布";
+
+            optionMapSS.series[0].name="无可用桩站点";
+            optionMapSS.series[1].name="普通站点";
+            optionMapSS.series[2].name="无可用车站点";
+            optionMapSS.series[3].name="不可用站点";
+            optionMapSS.series[0].data=convertData(ret0);
+            optionMapSS.series[1].data=convertData(ret1);
+            optionMapSS.series[2].data=convertData(ret2);
+            optionMapSS.series[3].data=convertData(ret3);
+            myMapSS.setOption(optionMapSS);
+        },error:(e)=>{
+            myMapSS.hideLoading();
+            alert("下载数据失败！");
+            return;
+        }});
+    }
+    function setMapDataIoTop(data){
+        var ret0=[];
+        var ret1=[];
+        var ret2=[];
+        var ret3=[];
+        sum_val=0;
+        for(var i in data){
+            var station=data[i];
+            let num=station.in+station.out;
+            if (i<25) ret0.push({name:idnameMap[station.station_id], value:num});
+            else if (i<50) ret1.push({name:idnameMap[station.station_id], value:num});
+            else if (i<75) ret2.push({name:idnameMap[station.station_id], value:num});
+            else if (i<100) ret3.push({name:idnameMap[station.station_id], value:num});
+
+            if (num>val_max)val_max=num;
+        }
+        optionMapSS.title.text="前100名热门站点"
+        optionMapSS.series[0].name="前25名";
+        optionMapSS.series[1].name="前26-50名";
+        optionMapSS.series[2].name="前51-75名";
+        optionMapSS.series[3].name="前76-100名";
+        optionMapSS.series[0].data=convertData(ret0);
+        optionMapSS.series[1].data=convertData(ret1);
+        optionMapSS.series[2].data=convertData(ret2);
+        optionMapSS.series[3].data=convertData(ret3);
+        myMapSS.setOption(optionMapSS);
+    }
+    function setMapDataList(data){
+        var ret0=[];
+        var ret1=[];
+        var ret2=[];
+        var ret3=[];
+        for(var i in data){
+            var station_id=data[i];
+            ret3.push({name:idnameMap[station_id], value:20});
+        }
+        val_max=40;
+        optionMapSS.title.text="长时间没有车的站点"
+        optionMapSS.series[3].name="无车站点";
+        optionMapSS.series[0].data=[];
+        optionMapSS.series[1].data=[];
+        optionMapSS.series[2].data=[];
+        optionMapSS.series[3].data=convertData(ret3);
+        myMapSS.setOption(optionMapSS);
+    }
+
+    //------------------------------------------------
+    var rateChart= echarts.init(document.getElementById('rateChartSS'));
+    var option_rateChartSS = {
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b}: {c} ({d}%)'
+        },
+        legend: {
+            data: ['电动车数','自行车数','已损坏车数']
+        },
+        series: [
+            {
+                name: '属性',
+                type: 'pie',
+                selectedMode: 'single',
+                radius: [0, '25%'],
+                label: {
+                    formatter: '{b}\n{d}%',
+                    position: 'inner',
+                    fontSize: 14,
+                },
+                labelLine: {
+                    show: false
+                },
+                data: [
+                    {value: 1548, name: '可用车',selected: true},
+                    {value: 775, name: '可用桩'},
+                ]
+            },
+            {
+                name: '属性',
+                type: 'pie',
+                radius: ['40%', '55%'],
+                labelLine: {
+                    length: 30,
+                },
+                label: {
+                    formatter: '{a|{a}}{abg|}\n{hr|}\n  {b|{b}：}{c}  {per|{d}%}  ',
+                    backgroundColor: '#F6F8FC',
+                    borderColor: '#8C8D8E',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    rich: {
+                        a: {
+                            color: '#6E7079',
+                            lineHeight: 22,
+                            align: 'center'
+                        },
+                        hr: {
+                            borderColor: '#8C8D8E',
+                            width: '100%',
+                            borderWidth: 1,
+                            height: 0
+                        },
+                        b: {
+                            color: '#4C5058',
+                            fontSize: 14,
+                            fontWeight: 'bold',
+                            lineHeight: 33
+                        },
+                        per: {
+                            color: '#fff',
+                            backgroundColor: '#4C5058',
+                            padding: [3, 4],
+                            borderRadius: 4
+                        }
+                    }
+                },
+                data: [
+                    {value: 1048, name: '电动车数'},
+                    {value: 335, name: '自行车数'},
+                    {value: 310, name: '已损坏车数'}
+                ]
+            }
+        ]
+    };
+    //--------------------------------------------
+    var statueUrl='https://gbfs.citibikenyc.com/gbfs/en/station_status.json'
+    myMapSS.on('click',function (e) {
+        var name=e.data.name;
+        selId=nameIdMap[name];
+        // station_name.innerHTML=name;
+        // station_id.innerHTML=selId;
+
+        $.get(statueUrl,function (result) {
+            console.log('收到相应数据:',result)
+            var stations=result.data.stations
+            var station;
+            for (i in stations){
+                station = stations[i]
+                if (station.station_id===selId) break;
+            }
+            if (station){
+                // station_id.innerHTML=station.station_id;
+                // num_bikes_available.innerHTML=station.num_bikes_available;
+                // num_bikes_disabled.innerHTML=station.num_bikes_disabled;
+                // num_docks_available.innerHTML=station.num_docks_available;
+                // num_docks_disabled.innerHTML=station.num_docks_disabled;
+                // num_ebikes_available.innerHTML=station.num_ebikes_available;
+                // station_status.innerHTML=station.station_status;
+                option_rateChartSS.series[0].name=idnameMap[station.station_id];
+                option_rateChartSS.series[1].name=idnameMap[station.station_id];
+                option_rateChartSS.series[0].data=[
+                    {value: station.num_bikes_available+station.num_ebikes_available, name: '可用车',selected: true},
+                    {value: station.num_docks_available, name: '可用桩'}]
+                option_rateChartSS.series[1].data=[
+                    {value: station.num_ebikes_disabled, name: '电动车数'},
+                    {value: station.num_bikes_available, name: '自行车数',selected:true},
+                    {value: station.num_bikes_disabled, name: '已损坏车数'}
+                ]
+                rateChart.setOption(option_rateChartSS);
+            }
+        })
+    });
+    var actionChartSS = echarts.init(document.getElementById('chartSS'));
+    var option_chartSS = {
+        title: {text: ''},
+        xAxis: {
+            type: 'category',
+            data: ["20:50", "20:55", "21:00", "21:05", "21:10", "21:15", "21:20", "21:25", "21:30", "21:35", "21:40", "21:45"]
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [{
+            data: [11, 12, 10, 9, 11, 12, 12, 12, 10, 11, 12, 11],
+            type: 'line',
+            smooth: true
+        }]
+    };
+    actionChartSS.setOption(option_chartSS);
+    function getRealtimeData(what,sid,start,end) {
+        if (!sid||!start||!end){
+            alert("您未选择站点或时间段！");
+            return;
+        }
+        actionChartSS.showLoading();
+        $.ajax({
+            url:root_url+"/realtime/nabt",
+            data:{
+                what:what,
+                sid:sid,
+                startTime:start,
+                endTime:end
+            },
+            success:(res)=>{
+                console.log(res)
+                actionChartSS.hideLoading();
+                //收到相应数据
+                var xData=res.xData;
+                for (var i in xData) xData[i]=xData[i].split(" ")[1].substr(0,5);
+                option_chartSS.xAxis.data=xData;
+                option_chartSS.series[0].data=res.yData;
+                option_chartSS.title.text="可用车数走势";
+                // console.log('收到相应数据:',xData,result.yData);
+                actionChartSS.setOption(option_chartSS);
+            },error:()=>{
+                actionChartSS.hideLoading();
+                alert("未获取到数据！");
+            }
+        })
+    }
+
+
+</script>

@@ -2,8 +2,7 @@ package bby.ben.service;
 
 import bby.ben.bbytool.MyTool;
 import bby.ben.dao.RealtimeDao;
-import bby.ben.pojo.BikesLivelyData;
-import bby.ben.pojo.StationNTData;
+import bby.ben.pojo.*;
 import cn.hutool.db.Entity;
 
 import java.sql.Timestamp;
@@ -22,7 +21,7 @@ public class RealtimeService {
      * @author: 本小蛋
      * @time: 2021/7/16 15:51
      */
-    public StationNTData findNbaBySid(String sid, int hour){
+    public StationNTData findNbaBySid(int sid, int hour){
         List<Entity> list = realtimeDao.listNbaBySid(sid, hour);
         List<String> xData=new ArrayList<>();
         List<Integer> yData=new ArrayList<>();
@@ -46,7 +45,7 @@ public class RealtimeService {
      * @author: 本小蛋
      * @time: 2021/7/21 16:29
      */
-    public StationNTData findNbaBySid(String sid, long startTime,long endTime){
+    public StationNTData findNbaBySid(int sid, long startTime,long endTime){
         List<Entity> list = realtimeDao.listNbaBySid(sid, new Timestamp(startTime),new Timestamp(endTime));//date是java.sql.Date;
         List<String> xData=new ArrayList<>();
         List<Integer> yData=new ArrayList<>();
@@ -69,7 +68,7 @@ public class RealtimeService {
      * @author: 本小蛋
      * @time: 2021/7/16 20:57
      */
-    public StationNTData findNdaBySid(String sid, int hour){
+    public StationNTData findNdaBySid(int sid, int hour){
         List<Entity> list = realtimeDao.listNdaBySid(sid, hour);
         List<String> xData=new ArrayList<>();
         List<Integer> yData=new ArrayList<>();
@@ -84,6 +83,43 @@ public class RealtimeService {
 
         return new StationNTData(xData,yData);
     }
+    public StationNTData findNdaBySid(int sid,long startTime,long endTime){
+        List<Entity> list = realtimeDao.listNdaBySid(sid, new Timestamp(startTime),new Timestamp(endTime));
+        List<String> xData=new ArrayList<>();
+        List<Integer> yData=new ArrayList<>();
+        if (list==null){
+            MyTool.log("findNdaBySid() 查询数据库错误！");
+            return null;
+        }
+        for (Entity entity :list){
+            xData.add(entity.getStr("created_time"));
+            yData.add(entity.getInt("num_docks_available"));
+        }
+
+        return new StationNTData(xData,yData);
+    }
+    /**
+     * @description: 查损坏数
+     * @param
+     * @return:
+     * @author: 本小蛋
+     * @time: 2021/7/23 0:17
+     */
+    public StationNTData findNbdBySid(int sid,long startTime,long endTime){
+        List<Entity> list = realtimeDao.listNbdBySid(sid, new Timestamp(startTime),new Timestamp(endTime));
+        List<String> xData=new ArrayList<>();
+        List<Integer> yData=new ArrayList<>();
+        if (list==null){
+            MyTool.log("findNbdBySid() 查询数据库错误！");
+            return null;
+        }
+        for (Entity entity :list){
+            xData.add(entity.getStr("created_time"));
+            yData.add(entity.getInt("num_bikes_disabled"));
+        }
+
+        return new StationNTData(xData,yData);
+    }
     /**
      * @description: 获取hour小时内sid站点的可用电动车数量变化
      * @param sid 站点id
@@ -92,7 +128,7 @@ public class RealtimeService {
      * @author: 本小蛋
      * @time: 2021/7/17 14:40
      */
-    public StationNTData findNeaBySid(String sid, int hour){
+    public StationNTData findNeaBySid(int sid, int hour){
         List<Entity> list = realtimeDao.listNeaBySid(sid, hour);
         List<String> xData=new ArrayList<>();
         List<Integer> yData=new ArrayList<>();
@@ -133,8 +169,8 @@ public class RealtimeService {
      * @author: 本小蛋
      * @time: 2021/7/17 13:22
      */
-    public  HashMap<String, BikesLivelyData> getLivelyIOList(int minute){
-        List<Entity> list = realtimeDao.listNumBikes(minute);
+    public  HashMap<String, BikesLivelyData> getLivelyIOList(int hour){
+        List<Entity> list = realtimeDao.listNumBikes(hour);
 
         if (list==null){
             MyTool.log("getLivelyIOList() 查询数据库错误！");
@@ -182,5 +218,51 @@ public class RealtimeService {
         ioList.sort((s1,s2)->s2.in+s2.out-s1.in-s1.out);
         int len=ioList.size()<top? ioList.size() : top;
         return ioList.subList(0,len);
+    }
+
+    public UtypeStimeDisbVo getReq2(int day){
+        List<Entity> list=realtimeDao.req2(day);
+        List<String> anu_Data = new ArrayList<>();
+        List<String> cus_Data = new ArrayList<>();
+        for(Entity entity:list){
+            if(entity.getStr("usertype").equals("Subscriber"))
+                anu_Data.add(entity.getStr("starttime"));
+            else
+                cus_Data.add(entity.getStr("starttime"));
+        }
+        UtypeStimeDisbVo vo= new UtypeStimeDisbVo(cus_Data,anu_Data);
+        return vo;
+    }
+    public UtypeSumAVgVo getReq3(Timestamp start, Timestamp end){
+        List<Entity> list=realtimeDao.req3(start,end);
+        List<String> usertype=new ArrayList<>();
+        List<Integer> sum_triduration=new ArrayList<>();
+        List<Integer> sum_num=new ArrayList<>();
+        List<Integer> avg=new ArrayList<>();
+        for(Entity entity:list){
+            usertype.add(entity.getStr("usertype"));
+            sum_triduration.add(entity.getInt("sum(tripduration)"));
+            sum_num.add(entity.getInt("count(*)"));
+            avg.add(entity.getInt("avg(tripduration)"));
+        }
+        UtypeSumAVgVo vo= new UtypeSumAVgVo(usertype,sum_triduration,sum_num,avg);
+        return vo;
+    }
+    public HotStartEndVo getReq4(String type, Timestamp start, Timestamp end){
+        List<Entity> list=realtimeDao.req4_s(start, end);
+        if(type.equals("start")) {
+            list = realtimeDao.req4_s(start, end);
+        }
+        else{
+            list = realtimeDao.req4_e(start, end);
+        }
+        List<String> station_id=new ArrayList<>();
+        List<String> act=new ArrayList<>();
+        for(Entity entity:list){
+            station_id.add(entity.getStr("start_station_id"));
+            act.add(entity.getStr("act"));
+        }
+        HotStartEndVo vo=new HotStartEndVo(station_id,act);
+        return vo;
     }
 }

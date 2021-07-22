@@ -14,7 +14,7 @@ public class RealtimeServiceTest {
     public void findNbaBySid() {
         RealtimeService service=new RealtimeService();
         long now=new Date().getTime();
-        StationNTData list = service.findNbaBySid("72", now - 600000, now);
+        StationNTData list = service.findNbaBySid(72, now - 600000, now);
         System.out.println(list);
     }
     @Test

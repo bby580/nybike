@@ -8,9 +8,9 @@ function connectError(chart){
 //*************要求6********************************************
 let activetop = echarts.init(document.getElementById('active'));
 function getTopData(){
-    let minute=topMinInput.value;
+    let hour=topMinInput.value;
     let pai=paihang.value;
-    let paiurl=this_url+"/list?what=iotop&minute="+minute+"&top="+pai;
+    let paiurl=this_url+"/list?what=iotop&hour="+hour+"&top="+pai;
     var stationid=[];
     var top_in=[];
     var top_out=[];

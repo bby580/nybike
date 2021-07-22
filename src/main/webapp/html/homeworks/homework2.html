@@ -95,9 +95,9 @@
   </div>
 
   <div class="mode-box" id="active-top-box">
-    <h2>6. 查询<span style="color:red;">n</span>分钟内活跃度排行</h2>
+    <h2>6. 查询<span style="color:red;">n</span>小时内活跃度排行</h2>
     <div class="mode-controls">
-      <span>输入n分钟数：</span><input class="min-input" type="number" oninput="if(value<=0)value=1;else if(value>1200)value=1200;" value="60" id="topMinInput">
+      <span>输入n小时：</span><input class="min-input" type="number" oninput="if(value<=0)value=1;else if(value>24)value=24;" value="1" id="topMinInput">
       <span>输入前多少排行</span><input class="min-input" type="number" oninput="if(value<=0)value=1;else if(value>200)value=200;" value="100" id="paihang">
       <button onclick="getTopData()">查询</button>
     </div>

@@ -7,13 +7,20 @@ bindPageFram("demo1Bt","html/demos/demo1.html");
 bindPageFram("scatterDemo2Bt","html/demos/scatterDemo2.html");
 bindPageFram("scatterDemo1Bt","html/demos/scatterDemo1.html");
 
+bindPage("useNumPerDayBt","subpage/useNumPerDay.html");
+bindPage("stationRankingListBt","subpage/stationRankingList.html");
+bindPage("realtimeInfoBt","subpage/realtime.html");
+
+$("#htmlContent").load("subpage/realtime.html");
 function bindPageFram(id,url){
     $("#"+id).click(function () {
-        mainContentFr.src=url
+        $("#htmlContent").html("<iframe id='iframContent'></iframe>");
+        iframContent.src=url
     });
 }
 function bindPage(id,url){
     $("#"+id).click(function () {
-        $("#mainContent").load(url);
+        $("#htmlContent").html("");
+        $("#htmlContent").load(url);
     });
 }

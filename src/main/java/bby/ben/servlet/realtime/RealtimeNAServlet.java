@@ -19,13 +19,14 @@ public class RealtimeNAServlet extends HttpServlet {
 
     @Override
     public void service(ServletRequest req, ServletResponse resp) throws ServletException, IOException {
-        String sid=req.getParameter("sid");
+        String sidStr=req.getParameter("sid");
         String hourStr=req.getParameter("hour");
         String what=req.getParameter("what");
 
         StationNTData stationNTData=null;
-        if (MyTool.isDigit(hourStr) &&MyTool.isDigit(sid)){
+        if (MyTool.isDigit(hourStr) &&MyTool.isDigit(sidStr)){
             int hour=Integer.parseInt(hourStr);
+            int sid=Integer.parseInt(sidStr);
             if ("nba".equals(what))
                 stationNTData = realtimeService.findNbaBySid(sid,hour);
             else if ("nda".equals(what))

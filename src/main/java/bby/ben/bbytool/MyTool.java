@@ -9,7 +9,8 @@ public class MyTool {
 //    }
     public static void log(Object... objs){
         System.out.print("-------"+new Date()+"----->");
-        for (Object obj :objs) System.out.println(obj+", ");
+        for (Object obj :objs) System.out.print(obj+" ");
+        System.out.println("");
     }
     public static boolean isDigit(String str){
         return Pattern.matches("^[0-9]+$",str);

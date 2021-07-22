@@ -23,14 +23,15 @@ public class RealtimePeriodServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json;charset=utf-8");
-        String sid=req.getParameter("sid");
+        String sidStr=req.getParameter("sid");
         String startTimeStr=req.getParameter("startTime");
         String endTimeStr=req.getParameter("endTime");
         String what=req.getParameter("what");
         StationNTData stationNTData=null;
-        if (MyTool.isDigit(sid)&&MyTool.isDigit(startTimeStr)&&MyTool.isDigit(endTimeStr)){
+        if (MyTool.isDigit(sidStr)&&MyTool.isDigit(startTimeStr)&&MyTool.isDigit(endTimeStr)){
             long startTime=Long.parseLong(startTimeStr);
             long endTime=Long.parseLong(endTimeStr);
+            int sid=Integer.parseInt(sidStr);
             if ("nba".equals(what))
                 stationNTData = realtimeService.findNbaBySid(sid,startTime,endTime);
         }
